@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import subprocess
 import platform
 import re
+import socket
 
 app = Flask(__name__)
 
@@ -38,10 +39,16 @@ def ping(host):
     else:
         latency = "Very Poor"
 
+    try:
+        hostname = socket.gethostbyaddr(host)[0]
+    except Exception:
+        hostname = "---"
+
     return {
         "online": online,
         "ping_ms": ping_ms,
-        "latency": latency
+        "latency": latency,
+        "hostname": hostname,
     }
 
 
@@ -71,16 +78,15 @@ def index():
             rows.append(
                 {
                     "ip": ip,
-                    "info": info
+                    "info": info,
                 }
             )
 
         if action == "add":
             rows.append(
-
                 {
                     "ip": "",
-                    "info": None
+                    "info": None,
                 }
             )
 
@@ -91,15 +97,16 @@ def index():
             rows.append(
                 {
                     "ip": "",
-                    "info": None
+                    "info": None,
                 }
             )
 
     return render_template(
         "index.html",
-        rows=rows
+        rows=rows,
     )
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
