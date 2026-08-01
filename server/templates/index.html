@@ -1,22 +1,101 @@
-<!doctype html><html><head>
-<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
-</head><body>
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Mine Operations Centre</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
 <h1>Mine Operations Centre</h1>
-<form method="post">
+
+<form method="POST">
+
 <table>
-<tr><th>IP Address</th><th>Status</th></tr>
-{% for row in rows %}
+
 <tr>
-<td><input name="ip" value="{{row.ip}}" placeholder="192.168.1.10"></td>
-<td>
-{% if row.status==True %}🟢 Online
-{% elif row.status==False %}🔴 Offline
-{% else %}⚪ Unknown{% endif %}
-</td>
+    <th>IP Address</th>
+    <th>Status</th>
+    <th>Action</th>
 </tr>
+
+{% for row in rows %}
+
+<tr>
+
+<td>
+
+<input
+    type="text"
+    name="ip"
+    value="{{ row.ip }}"
+    placeholder="192.168.1.10">
+
+</td>
+
+<td>
+
+{% if row.status == True %}
+🟢 Online
+{% elif row.status == False %}
+🔴 Offline
+{% else %}
+⚪ Unknown
+{% endif %}
+
+</td>
+
+<td>
+
+<button
+    type="submit"
+    name="action"
+    value="remove">
+
+    Remove
+
+</button>
+
+<input
+    type="hidden"
+    name="remove"
+    value="{{ loop.index0 }}">
+
+</td>
+
+</tr>
+
 {% endfor %}
-</table><br>
-<button type="submit">Monitor</button>
-<button type="submit" name="add" value="1">+ Add IP Address</button>
+
+</table>
+
+<br>
+
+<button
+    type="submit"
+    name="action"
+    value="monitor">
+
+Monitor
+
+</button>
+
+<button
+    type="submit"
+    name="action"
+    value="add">
+
++ Add IP Address
+
+</button>
+
 </form>
-</body></html>
+
+</body>
+
+</html>
