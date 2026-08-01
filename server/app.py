@@ -1,24 +1,54 @@
 from flask import Flask, render_template, request
 import subprocess
 import platform
+import re
 
 app = Flask(__name__)
 
 
 def ping(host):
     flag = "-n" if platform.system().lower() == "windows" else "-c"
+
     result = subprocess.run(
         ["ping", flag, "1", host],
         capture_output=True,
         text=True
     )
-    return result.returncode == 0
+
+    output = result.stdout
+
+    online = result.returncode == 0
+    ping_ms = None
+
+    match = re.search(r"time[=<]\s*(\d+)", output)
+
+    if match:
+        ping_ms = int(match.group(1))
+
+    if ping_ms is None:
+        latency = "---"
+    elif ping_ms <= 10:
+        latency = "Excellent"
+    elif ping_ms <= 30:
+        latency = "Good"
+    elif ping_ms <= 60:
+        latency = "Fair"
+    elif ping_ms <= 100:
+        latency = "Poor"
+    else:
+        latency = "Very Poor"
+
+    return {
+        "online": online,
+        "ping_ms": ping_ms,
+        "latency": latency
+    }
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
 
-    rows = [{"ip": "", "status": None}]
+    rows = [{"ip": "", "info": None}]
 
     if request.method == "POST":
 
@@ -27,29 +57,30 @@ def index():
         ips = request.form.getlist("ip")
 
         action = request.form.get("action")
-
         remove = request.form.get("remove")
 
         for ip in ips:
+
             ip = ip.strip()
 
-            status = None
+            info = None
 
-            if action == "monitor" and ip:
-                status = ping(ip)
+            if action in ("monitor", "refresh") and ip:
+                info = ping(ip)
 
             rows.append(
                 {
                     "ip": ip,
-                    "status": status
+                    "info": info
                 }
             )
 
         if action == "add":
             rows.append(
+
                 {
                     "ip": "",
-                    "status": None
+                    "info": None
                 }
             )
 
@@ -60,7 +91,7 @@ def index():
             rows.append(
                 {
                     "ip": "",
-                    "status": None
+                    "info": None
                 }
             )
 

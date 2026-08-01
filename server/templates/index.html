@@ -21,6 +21,8 @@
 <tr>
     <th>IP Address</th>
     <th>Status</th>
+    <th>Ping</th>
+    <th>Latency</th>
     <th>Action</th>
 </tr>
 
@@ -40,12 +42,36 @@
 
 <td>
 
-{% if row.status == True %}
-🟢 Online
-{% elif row.status == False %}
-🔴 Offline
+{% if row.info %}
+
+    {% if row.info.online %}
+        🟢 Online
+    {% else %}
+        🔴 Offline
+    {% endif %}
+
 {% else %}
 ⚪ Unknown
+{% endif %}
+
+</td>
+
+<td>
+
+{% if row.info and row.info.ping_ms is not none %}
+{{ row.info.ping_ms }} ms
+{% else %}
+---
+{% endif %}
+
+</td>
+
+<td>
+
+{% if row.info %}
+{{ row.info.latency }}
+{% else %}
+---
 {% endif %}
 
 </td>
@@ -55,9 +81,18 @@
 <button
     type="submit"
     name="action"
+    value="refresh">
+
+Refresh
+
+</button>
+
+<button
+    type="submit"
+    name="action"
     value="remove">
 
-    Remove
+Remove
 
 </button>
 
@@ -81,7 +116,7 @@
     name="action"
     value="monitor">
 
-Monitor
+Refresh All
 
 </button>
 
