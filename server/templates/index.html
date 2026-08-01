@@ -1,0 +1,22 @@
+<!doctype html><html><head>
+<link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+</head><body>
+<h1>Mine Operations Centre</h1>
+<form method="post">
+<table>
+<tr><th>IP Address</th><th>Status</th></tr>
+{% for row in rows %}
+<tr>
+<td><input name="ip" value="{{row.ip}}" placeholder="192.168.1.10"></td>
+<td>
+{% if row.status==True %}🟢 Online
+{% elif row.status==False %}🔴 Offline
+{% else %}⚪ Unknown{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table><br>
+<button type="submit">Monitor</button>
+<button type="submit" name="add" value="1">+ Add IP Address</button>
+</form>
+</body></html>
